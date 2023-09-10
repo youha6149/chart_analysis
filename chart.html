@@ -1,0 +1,148 @@
+<!-- <!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
+      google.charts.load('current', {'packages':['corechart']});
+           
+      function drawChart(chartData) {
+        const data = google.visualization.arrayToDataTable(chartData, true);
+
+        const options = {
+          legend: 'none',
+          bar: { groupWidth: '100%' }, // バーの幅を調整
+          candlestick: {
+            fallingColor: { strokeWidth: 0, fill: '#a52714' }, // 落ちる価格
+            risingColor: { strokeWidth: 0, fill: '#0f9d58' }   // 上昇する価格
+          },
+          hAxis: {
+            format: 'M/d/yy', // 日付のフォーマットを設定
+            title: 'Date'
+          }
+        };
+        const chart = new google.visualization.CandlestickChart(document.getElementById('chart_div'));
+
+        chart.draw(data, options);
+      }
+
+      function fetchChartData() {
+        const symbol_code = document.getElementById("symbol_code").value;
+        const interval = document.getElementById("interval").value;
+        
+        google.script.run
+        .withSuccessHandler(drawChart)
+        .withFailureHandler(function(error) {
+            console.error("Error fetching chart data:", error);
+        })
+        .getChartData(symbol_code, interval);
+      }
+
+    </script>
+  </head>
+  <body>
+    <div>
+      <label>証券コード:</label>
+      <input type="text" id="symbol_code">
+      <label>間隔:</label>
+      <select id="interval">
+        <option value="1d">日足</option>
+        <option value="1wk">週足</option>
+        <option value="1mo">月足</option>
+      </select>
+      <button onclick="fetchChartData()">チャートを表示</button>
+    </div>
+    <div id="chart_div" style="width: 800px; height: 500px;"></div>
+  </body>
+</html> -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- レスポンシブデザインのためのビューポート設定 -->
+    <title>Financial | Chart.js</title>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@1.26.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.0.1/dist/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.0.0"></script>
+    <script src="https://www.chartjs.org/chartjs-chart-financial/chartjs-chart-financial.js"></script>
+    <style>
+        /* レスポンシブデザインのための基本的なスタイル */
+        body {
+            font-family: 'Arial', sans-serif;
+            padding: 20px;
+        }
+
+        canvas {
+            max-width: 70%;
+        }
+
+        @media (max-width: 768px) {
+            /* タブレットやスマートフォンのサイズに合わせてスタイルを調整 */
+            body {
+                padding: 10px;
+            }
+
+            div {
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+  <div>
+    <label>証券コード:</label>
+    <input type="text" id="symbol_code">
+    <label>間隔:</label>
+    <select id="interval">
+        <option value="1d">日足</option>
+        <option value="1wk">週足</option>
+        <option value="1mo">月足</option>
+    </select>
+    <button onclick="fetchChartData()">チャートを表示</button>
+  </div>
+  <div>
+      <canvas id="chart"></canvas>
+  </div>
+  <script>
+    const ctx = document.getElementById('chart').getContext('2d');
+
+    const fetchChartData = () => {
+      const symbol_code = document.getElementById("symbol_code").value;
+      const interval = document.getElementById("interval").value;
+
+      google.script.run
+        .withSuccessHandler(data => {
+          console.log("Received Data:", data);
+          drawChart(data);
+        })
+        .withFailureHandler(error => {
+          console.error("Error fetching chart data:", error);
+        })
+        .getChartData(symbol_code, interval);
+    }
+
+    const drawChart = (rawData) => {
+      const chartData = rawData.map(row => ({
+        x: luxon.DateTime.fromFormat(row["timestamp"], "yyyy/MM/dd").valueOf(),
+        o: row["open"],
+        h: row["high"],
+        l: row["low"],
+        c: row["close"]
+      }));
+
+      console.log("Processed Chart Data:", chartData);
+
+      new Chart(ctx, {
+        type: 'candlestick',
+        data: {
+          datasets: [{
+            label: 'CHRT - Stock Data',
+            data: chartData
+          }]
+        }
+      });
+    }
+  </script>
+</body>
+</html>
