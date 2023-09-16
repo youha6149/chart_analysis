@@ -1,3 +1,9 @@
+// URL
+// https://script.google.com/macros/s/AKfycbwSgvI9bf6a1RBK3hBSqbTocgQriN5vB5D_VgNtCqm-OOtu-Ad-L0SLrUFNn9PyTCr8ug/exec
+
+// repository
+// https://github.com/youha6149/chart_analysis
+
 const HOURS_TO_EXECUTE = 15;
 const MINUTES_TO_EXECUTE = 0;
 const SECONDS_TO_EXECUTE = 0;
